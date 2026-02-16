@@ -25,27 +25,6 @@ Help students track spending and build budgeting habits with minimal friction.
 
 - Settings: export/import JSON, currency selection, accessibility toggles (reduce motion, high contrast).
 
-## Wireframe
-
-student-finance-tracker/
-│
-├── index.html
-├── tests.html
-├── seed.json
-│
-├── styles/
-│   └── main.css
-│
-├── scripts/
-│   ├── state.js
-│   ├── storage.js
-│   ├── validators.js
-│   ├── search.js
-│   └── ui.js
-│
-└── README.md
-
-
 
 ## 3. Data Models
 
