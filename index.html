@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Finance Tracker</title>
     <link rel="stylesheet" href="styles/main.css">
+    
 </head>
 <body>
     <a href="#main" class="skip-link">Skip to content</a>
@@ -28,21 +29,70 @@
             
             <section id="dashboard">
                 <h2>Dashboard</h2>
+                <!-- span separates the data and the labels making in it accessible -->
+                 
                 <div class="stats">
-                    <div class="stat-card">Total Transactions: 0</div>
-                    <div class="stat-card">Total Amount: $0</div>
-                    <div class="stat-card">Top Category: -</div>
-                    <div class="stat-card">Last 7 Days: -</div>
+                    <div class="stat-card">Total Transactions: <span id="total-transactions">0</span></div>
+                    <div class="stat-card">Total Amount: $<span id="total-amount">0</span></div>
+                    <div class="stat-card">Top Category: <span id="top-category">-</span></div>
+                    <div class="stat-card">Last 7 Days: <span id="last-7-days">0</span></div>
                 </div>
+
             </section>
 
             <section id="Records">
                 <h2>Records</h2>
+                <!---table to display financial records--->
+
+                <table id="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                            <th>Category</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody">
+                        <!-- Records will be dynamically inserted here -->
+                    </tbody>
+                </table>
                 
             </section>
 
-            <section id="transactions">
+            <section id="form">
                 <h2>New Transactions</h2>
+
+                <form id="transaction-form" novalidate>
+                    <!--novalidate attribute is used to ignore default browser validation messages-->
+                    
+                    <label for="description">Description:</label>
+                    <input type="text" id="description" name="description" required>
+
+                    <label for="amount">Amount:</label>
+                    <input type="number" id="amount" name="amount" required>
+
+                    <label for="category">Category:</label>
+                    <select id="category" name="category" required>
+                        <option value="">Select Category</option>
+                        <option value="Food">Food</option>
+                        <option value="Transport">Transport</option>
+                        <option value="Entertainment">Entertainment</option>
+                        <option value="Utilities">Utilities</option>
+                        <option value="Other">Other</option>
+                    </select>
+
+                    <label for="date">Date:</label>
+                    <input type="date" id="date" name="date" required>
+
+                    <button type="submit">Add Transaction</button>
+
+                    <!---status message container -->
+                    <div id="status-message">
+                        <p id="status-text" role="status" aria-live="polite"></p>
+                    </div>
+                </form>
             </section>
 
             <section id="settings">
@@ -59,5 +109,7 @@
     <footer>
         <p>&copy; 2024 Student Finance Tracker.</p>
     </footer>
-
+    <script type="module" src="scripts/ui.js"></script>
+    
+</body>
 </html>
