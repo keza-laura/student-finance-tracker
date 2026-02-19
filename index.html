@@ -18,11 +18,12 @@
                 <ul>
                     <li><a href="#dashboard">Dashboard</a></li>
                     <li><a href="#Records">Records</a></li>
-                    <li><a href="#transactions">New Transactions</a></li>
-                    <li><a href="#analytics">Setting</a></li>
-                    <li><a href="#reports">About</a></li>
+                    <li><a href="#form">New Transactions</a></li>
+                    <li><a href="#settings">Setting</a></li>
+                    <li><a href="#about">About</a></li>
                 </ul>
             </nav>
+            
         </header>
 
         <main id="main-content">
@@ -46,9 +47,9 @@
 
                 <div class="sorting-controls">
 
-                    <label for="sort-field">Sort By:</label>
+                    <!--<label for="sort-field">Sort By:</label>-->
                     <select id="sort-field">
-                        <option value="">Select Field</option>
+                        <option value="">Sort By</option>
                         <option value="description">Description</option>
                         <option value="amount">Amount</option>
                         <option value="category">Category</option>
@@ -65,8 +66,13 @@
 
                     </div>
 
+                    <div class="search-controls">
+                    <input type="search" id="site-search" name="search" placeholder="Search transactions...">
+                    <button type="button" id="search-button">Search</button>
+                    </div>
 
                 <table id="table">
+                   
                     <thead>
                         <tr>
                             <th data-field ="id">ID</th>
@@ -129,7 +135,7 @@
     </div>
 
     <footer>
-        <p>&copy; 2024 Student Finance Tracker.</p>
+        <p>&copy; 2026 Student Finance Tracker.</p>
     </footer>
     <script type="module" src="scripts/ui.js"></script>
     

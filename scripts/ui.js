@@ -1,4 +1,5 @@
 import { saveTransactions, loadTransactions } from "./storage.js";
+import { validateField, patterns} from "./validators.js";
 
 
 // Wait until the page loads
@@ -21,6 +22,12 @@ document.addEventListener("DOMContentLoaded", function () {
       statusMessage.style.color = "green";
     }
   }
+
+  const searchInput = document.getElementById("site-search");
+
+  searchInput.addEventListener("input", function () {
+    renderApp(); // Re-render the app to apply search filter
+  });
 
     const sortFieldSelect = document.getElementById("sort-field");
     const sortDirectionSelect = document.getElementById("sort-direction");
@@ -67,25 +74,36 @@ document.addEventListener("DOMContentLoaded", function () {
     const date = document.getElementById("date").value;
 
     // Validation
-    if (description === "") {
-      showMessage("Please enter a description.", true);
+    // Description validation
+    if (!validateField("description", description)) {
+      showMessage("Description cannot have leading or trailing spaces.", true);
       return;
     }
 
-    if (amount === "" || Number(amount) <= 0) {
-      showMessage("Please enter a valid amount greater than 0.", true);
+    // Advanced regex: duplicate word detection
+    if (patterns.duplicateWord.test(description)) {
+      showMessage("Duplicate word detected in description.", true);
       return;
     }
 
-    if (category === "") {
-      showMessage("Please choose a category.", true);
+    // Amount validation
+    if (!validateField("amount", amount)) {
+      showMessage("Invalid amount format (max 2 decimals).", true);
       return;
     }
 
-    if (date === "") {
-      showMessage("Please select a date.", true);
+    // Category validation
+    if (!validateField("category", category)) {
+      showMessage("Invalid category format.", true);
       return;
     }
+
+    // Date validation
+    if (!validateField("date", date)) {
+      showMessage("Invalid date format (YYYY-MM-DD).", true);
+      return;
+    }
+
 
     // Create transaction object and add to in-memory array
     const transaction = {
@@ -93,7 +111,9 @@ document.addEventListener("DOMContentLoaded", function () {
       description,
       amount: parseFloat(amount),
       category,
-      date
+      date,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     };
 
     transactionArr.push(transaction);
@@ -155,6 +175,43 @@ function showTable(transactions) {
   // Append the new row to the table body
   tableBody.appendChild(newRow);
     }
+}
+
+function renderCards(transactions) {
+
+  // Get the place where we want to show the cards
+  const tableBody = document.getElementById("tbody");
+
+  // Clear old content
+  tableBody.innerHTML = "";
+
+  // Create a container to hold all cards
+  const cardContainer = document.createElement("div");
+  cardContainer.className = "card-container";
+
+  // Loop through transactions using a normal for loop
+  for (let i = 0; i < transactions.length; i++) {
+
+    const txn = transactions[i];
+
+    // Create a card
+    const card = document.createElement("div");
+    card.className = "card";
+
+    // Add content to the card
+    card.innerHTML =
+      "<p><strong>ID:</strong> " + txn.id + "</p>" +
+      "<p><strong>Description:</strong> " + txn.description + "</p>" +
+      "<p><strong>Amount:</strong> $" + txn.amount + "</p>" +
+      "<p><strong>Category:</strong> " + txn.category + "</p>" +
+      "<p><strong>Date:</strong> " + txn.date + "</p>";
+
+    // Add the card to the container
+    cardContainer.appendChild(card);
+  }
+
+  // Add the container to the page
+  tableBody.appendChild(cardContainer);
 }
 
 
@@ -283,22 +340,57 @@ function sortData(data) {
 
 function renderApp() {
 
-  // Step 1: Make a copy of the transactions
+  // Make a copy of the transactions
   let dataToRender = transactionArr.slice();
 
-  // Step 2: Sort the data
+  // Sort the data
   dataToRender = sortData(dataToRender);
 
-  // Step 3: Check which view we are using
+  // Apply search filter if search input exists
+  const searchValue = document.getElementById("site-search").value.trim();
+  if (searchValue !== "") {
+
+    try {
+      const searchRegex = new RegExp(searchValue, "i"); // Case-insensitive search
+      
+      dataToRender = dataToRender.filter(function (txn) {
+        return (
+          searchRegex.test(txn.description) || 
+        searchRegex.test(txn.category) ||
+        searchRegex.test(txn.amount.toString()) ||
+        searchRegex.test(txn.date)
+        );
+      });
+
+    } 
+    
+    catch (error) {
+      console.error("Error during search:", error);
+    }
+
+}
+  // Check which view we are using
   if (currentView === "table") {
     showTable(dataToRender);
-  } else {
+  } 
+  else {
     renderCards(dataToRender);
   }
 }
 
-function renderCards(data) {
-  console.log("Card view not implemented yet");
-}
+// function renderCards(data) {
+//   const toggleBtn = document.getElementById("toggle-view");
+//   toggleBtn.addEventListener("click", () => {
+//   if (currentView === "table") {
+//     currentView = "cards";
+//     toggleBtn.textContent = "Switch to Table View";
+//   } else {
+//     currentView = "table";
+//     toggleBtn.textContent = "Switch to Cards View";
+//   }
+//   renderApp();
+// });
+
+// }
 
 
