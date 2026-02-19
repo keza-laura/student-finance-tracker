@@ -44,14 +44,36 @@
                 <h2>Records</h2>
                 <!---table to display financial records--->
 
+                <div class="sorting-controls">
+
+                    <label for="sort-field">Sort By:</label>
+                    <select id="sort-field">
+                        <option value="">Select Field</option>
+                        <option value="description">Description</option>
+                        <option value="amount">Amount</option>
+                        <option value="category">Category</option>
+                        <option value="date">Date</option>
+                    </select>
+
+                    <label for="sort-direction">Order:</label>
+                    <select id="sort-direction">
+                        <option value="asc">Ascending</option>
+                        <option value="desc">Descending</option>
+                    </select>
+
+                    <button type="button" id="apply-sort">Apply Sort</button>
+
+                    </div>
+
+
                 <table id="table">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Description</th>
-                            <th>Amount</th>
-                            <th>Category</th>
-                            <th>Date</th>
+                            <th data-field ="id">ID</th>
+                            <th data-field="description">Description</th>
+                            <th data-field="amount">Amount</th>
+                            <th data-field="category">Category</th>
+                            <th data-field="date">Date</th>
                         </tr>
                     </thead>
                     <tbody id="tbody">

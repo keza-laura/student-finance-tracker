@@ -1,3 +1,6 @@
+import { saveTransactions, loadTransactions } from "./storage.js";
+
+
 // Wait until the page loads
 document.addEventListener("DOMContentLoaded", function () {
 
@@ -18,6 +21,39 @@ document.addEventListener("DOMContentLoaded", function () {
       statusMessage.style.color = "green";
     }
   }
+
+    const sortFieldSelect = document.getElementById("sort-field");
+    const sortDirectionSelect = document.getElementById("sort-direction");
+    const applySortBtn = document.getElementById("apply-sort");
+
+    applySortBtn.addEventListener("click", function () {
+
+      const selectedField = sortFieldSelect.value;
+      const selectedDirection = sortDirectionSelect.value;
+
+      if (!selectedField) {
+        alert("Please select a field to sort by.");
+        return;
+      }
+
+      currentSort.field = selectedField;
+      currentSort.direction = selectedDirection;
+
+      renderApp();
+    });
+
+  // Load saved transactions from localStorage when the page loads
+    transactionArr = loadTransactions();
+
+    // Update counter to match saved transactions
+    counter = transactionArr.length;
+
+    // Add each transaction back into the table
+    renderApp();
+    
+
+    // Update dashboard with loaded transactions
+    addtodashboard();
 
   // When form is submitted
   form.addEventListener("submit", function (event) {
@@ -61,10 +97,14 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     transactionArr.push(transaction);
-    
-    addToTable(transaction);
-    addtodashboard();
 
+    saveTransactions(transactionArr); // Save to localStorage
+
+    //updates the table with the new transaction 
+    renderApp();
+
+    //Update dashboard stats
+    addtodashboard();
 
     // Clear form
     form.reset(); 
@@ -81,16 +121,29 @@ let transactionArr = [];
 let counter = 0;
 
 
+
+let currentView = "table";
+
+
+
+let currentSort = {
+  field: null,
+  direction: "asc"
+};
+// This object will keep track of the current sorting state in ascending or descending.
+
+
+
 // add to table
-function addToTable(transaction) {
+function showTable(transactions) {
   const tableBody = document.getElementById("tbody");
-  const newRow = document.createElement("tr");
-  //the id is generated using a counter to ensure uniqueness for each transaction record.
+  tableBody.innerHTML = ""; // Clear existing table rows
 
- 
-  //let id = `txn_${++counter}`;
+  for (let i = 0; i < transactions.length; i++) {
 
-
+    const transaction = transactions[i];
+    const newRow = document.createElement("tr");
+  
   newRow.innerHTML = `
     <td>${transaction.id}</td>
     <td>${transaction.description}</td>
@@ -101,17 +154,15 @@ function addToTable(transaction) {
 
   // Append the new row to the table body
   tableBody.appendChild(newRow);
+    }
 }
+
 
 function addtodashboard() {
   const totalTransactions = document.getElementById("total-transactions");
-  //const totalAmount = document.getElementById("total-amount");
-  //const topCategory = document.getElementById("top-category");
-  //const last7Days = document.getElementById("last-7-days");
 
   // Counts total transactions
    totalTransactions.textContent = transactionArr.length;
-
 
     // Calculate total amount 
     //loop to sum up the amounts of all transactions in the transactionArr array.
@@ -170,5 +221,84 @@ function addtodashboard() {
   }
 
   document.getElementById("last-7-days").textContent = last7DaysCount;
+
+
 }
+
+function sortData(data) {
+
+  // If no column is selected, return the original data
+  if (!currentSort.field) {
+    return data;
+  }
+
+  // Make a copy of the array (so we don't change the original)
+  const sorted = data.slice();
+
+  // Sort the copied array
+  sorted.sort(function (a, b) {
+
+    const valueA = a[currentSort.field];
+    const valueB = b[currentSort.field];
+
+    // If sorting by amount (numbers)
+    if (currentSort.field === "amount") {
+
+      if (currentSort.direction === "asc") {
+        return valueA - valueB;
+      } else {
+        return valueB - valueA;
+      }
+
+    }
+
+    // If sorting by date
+    if (currentSort.field === "date") {
+
+      const dateA = new Date(valueA);
+      const dateB = new Date(valueB);
+
+      if (currentSort.direction === "asc") {
+        return dateA - dateB;
+      } else {
+        return dateB - dateA;
+      }
+
+    }
+
+    // Default: compare as text (strings)
+    const textA = String(valueA);
+    const textB = String(valueB);
+
+    if (currentSort.direction === "asc") {
+      return textA.localeCompare(textB);
+    } else {
+      return textB.localeCompare(textA);
+    }
+
+  });
+
+  return sorted;
+}
+
+function renderApp() {
+
+  // Step 1: Make a copy of the transactions
+  let dataToRender = transactionArr.slice();
+
+  // Step 2: Sort the data
+  dataToRender = sortData(dataToRender);
+
+  // Step 3: Check which view we are using
+  if (currentView === "table") {
+    showTable(dataToRender);
+  } else {
+    renderCards(dataToRender);
+  }
+}
+
+function renderCards(data) {
+  console.log("Card view not implemented yet");
+}
+
 
