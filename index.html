@@ -5,15 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Finance Tracker</title>
     <link rel="stylesheet" href="styles/main.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     
 </head>
 <body>
-    <a href="#main" class="skip-link">Skip to content</a>
-
-    <div class = "container">
-        <header>
-            <h1>Student Finance Tracker</h1>
-
+    <header>
+            <a href="#main-content" class="skip-link">Skip to content</a>
+            <div class="title">
+                <h1>Student Finance Tracker</h1>
+            </div>
             <nav>
                 <ul>
                     <li><a href="#dashboard">Dashboard</a></li>
@@ -23,15 +25,12 @@
                     <li><a href="#about">About</a></li>
                 </ul>
             </nav>
-            
         </header>
 
-        <main id="main-content">
+        <main id="main">
             
             <section id="dashboard">
                 <h2>Dashboard</h2>
-                <!-- span separates the data and the labels making in it accessible -->
-                 
                 <div class="stats">
                     <div class="stat-card">Total Transactions: <span id="total-transactions">0</span></div>
                     <div class="stat-card">Total Amount: $<span id="total-amount">0</span></div>
@@ -39,62 +38,82 @@
                     <div class="stat-card">Last 7 Days: <span id="last-7-days">0</span></div>
                 </div>
 
+               
             </section>
 
             <section id="Records">
                 <h2>Records</h2>
-                <!---table to display financial records--->
 
-                <div class="sorting-controls">
+                <div class="controls-card">
 
-                    <!--<label for="sort-field">Sort By:</label>-->
-                    <select id="sort-field">
-                        <option value="">Sort By</option>
-                        <option value="description">Description</option>
-                        <option value="amount">Amount</option>
-                        <option value="category">Category</option>
-                        <option value="date">Date</option>
-                    </select>
-
-                    <label for="sort-direction">Order:</label>
-                    <select id="sort-direction">
-                        <option value="asc">Ascending</option>
-                        <option value="desc">Descending</option>
-                    </select>
-
-                    <button type="button" id="apply-sort">Apply Sort</button>
-
+                    <!-- Sort By -->
+                    <div class="field-group">
+                        <label class="field-label" for="sort-field">Sort By</label>
+                        <div class="select-wrap">
+                            <select id="sort-field">
+                                <option value="">Select field</option>
+                                <option value="description">Description</option>
+                                <option value="amount">Amount</option>
+                                <option value="category">Category</option>
+                                <option value="date">Date</option>
+                            </select>
+                        </div>
                     </div>
 
-                    <div class="search-controls">
-                    <input type="search" id="site-search" name="search" placeholder="Search transactions...">
-                    <button type="button" id="search-button">Search</button>
+                    <!-- Order -->
+                    <div class="field-group">
+                        <label class="field-label" for="sort-direction">Order</label>
+                        <div class="select-wrap">
+                            <select id="sort-direction">
+                                <option value="asc">Ascending</option>
+                                <option value="desc">Descending</option>
+                            </select>
+                        </div>
                     </div>
+
+                    <!-- Apply Sort -->
+                    <div class="field-group">
+                        <span class="field-label" aria-hidden="true">&nbsp;</span>
+                        <button type="button" id="apply-sort" class="btn-apply">Apply Sort</button>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="ctrl-divider" role="separator"></div>
+
+                    <!-- Search -->
+                    <div class="search-group">
+                        <label class="field-label" for="site-search">Search Records</label>
+                        <div class="search-row">
+                            <div class="input-wrap">
+                                <input type="search" id="site-search" name="search" placeholder="Search transactions..." autocomplete="off">
+                            </div>
+                            <button type="button" id="search-button" class="btn-search">Search</button>
+                        </div>
+                    </div>
+
+                </div>
 
                 <table id="table">
-                   
                     <thead>
                         <tr>
-                            <th data-field ="id">ID</th>
-                            <th data-field="description">Description</th>
-                            <th data-field="amount">Amount</th>
-                            <th data-field="category">Category</th>
-                            <th data-field="date">Date</th>
+                            <th>ID</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                            <th>Category</th>
+                            <th>Date</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="tbody">
                         <!-- Records will be dynamically inserted here -->
                     </tbody>
                 </table>
-                
             </section>
 
             <section id="form">
                 <h2>New Transactions</h2>
 
                 <form id="transaction-form" novalidate>
-                    <!--novalidate attribute is used to ignore default browser validation messages-->
-                    
                     <label for="description">Description:</label>
                     <input type="text" id="description" name="description" required>
 
@@ -116,7 +135,6 @@
 
                     <button type="submit">Add Transaction</button>
 
-                    <!---status message container -->
                     <div id="status-message">
                         <p id="status-text" role="status" aria-live="polite"></p>
                     </div>
@@ -125,10 +143,42 @@
 
             <section id="settings">
                 <h2>Settings</h2>
+
+                <div class="main-setting">
+                <label for="monthly-cap">Monthly Spending Limit:</label>
+                <input type="number" id="monthly-cap" min="0" step="0.01">
+
+                <label for="currency">Currency:</label>
+                <select id="currency">
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="FRW">FRW</option>
+                </select>
+
+                <button type="button" id="save-cap">Save Cap</button>
+                <p id="cap-message"></p>
+                <p id="settings-status" role="status" aria-live="polite"></p>
+            </div>
             </section>
 
             <section id="about">
                 <h2>About</h2>
+                <div class="about-card">
+                    <p>
+                    The <strong>Student Finance Tracker</strong> is a simple tool designed to help students 
+                    manage their expenses and keep track of their monthly spending. You can:
+                    </p>
+                    <ul>
+                    <li>Add and edit your financial transactions easily.</li>
+                    <li>Monitor your total spending and set monthly limits.</li>
+                    <li>Filter and sort your records to analyze your habits.</li>
+                    <li>Track your spending trends with a dashboard summary.</li>
+                    </ul>
+                    <p>
+                    Built with simplicity in mind, this tool helps students stay organized and develop 
+                    good financial habits early on.
+                    </p>
+                </div>
             </section>
 
         </main>
@@ -140,4 +190,5 @@
     <script type="module" src="scripts/ui.js"></script>
     
 </body>
+
 </html>

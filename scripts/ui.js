@@ -1,5 +1,21 @@
 import { saveTransactions, loadTransactions } from "./storage.js";
 import { validateField, patterns} from "./validators.js";
+import {searchFilter} from "./search.js"
+
+// Global variables
+let transactionArr = loadTransactions() || [];
+
+let currentSort = {
+  field: null,
+  direction: "asc"
+}; // This object will keep track of the current sorting state in ascending or descending.
+
+let editingId = null;
+
+let counter = 0;// This counter will be used to generate IDs for transactions.
+
+let currentView = "table"; // This variable will track whether we are in "table" or "cards" view.
+
 
 
 // Wait until the page loads
@@ -10,6 +26,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const form = document.getElementById("transaction-form");
   const statusMessage = document.getElementById("status-message");
   const statusText = document.getElementById("status-text");
+  const tableBody = document.getElementById("tbody"); 
 
   // Function to show messages (error or success)
   function showMessage(message, isError = false) {
@@ -23,46 +40,109 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  const searchInput = document.getElementById("site-search");
-
-  searchInput.addEventListener("input", function () {
-    renderApp(); // Re-render the app to apply search filter
-  });
-
-    const sortFieldSelect = document.getElementById("sort-field");
-    const sortDirectionSelect = document.getElementById("sort-direction");
-    const applySortBtn = document.getElementById("apply-sort");
-
-    applySortBtn.addEventListener("click", function () {
-
-      const selectedField = sortFieldSelect.value;
-      const selectedDirection = sortDirectionSelect.value;
-
-      if (!selectedField) {
-        alert("Please select a field to sort by.");
-        return;
-      }
-
-      currentSort.field = selectedField;
-      currentSort.direction = selectedDirection;
-
-      renderApp();
-    });
-
+  //-----------------------
+  //TRANSACTIONS LOGIC
+  //-----------------------
   // Load saved transactions from localStorage when the page loads
-    transactionArr = loadTransactions();
 
     // Update counter to match saved transactions
-    counter = transactionArr.length;
-
-    // Add each transaction back into the table
+   // Update counter to the highest existing transaction number
+    counter = transactionArr.reduce(
+    (max, txn) => Math.max(max, parseInt(txn.id.replace("txn_", ""), 10)),
+    0
+    );
     renderApp();
-    
-
     // Update dashboard with loaded transactions
     addtodashboard();
 
-  // When form is submitted
+    //-----------------------------
+    // EDIT & DELETE LOGIC
+    //-----------------------------
+  // Listen for clicks inside the table body
+  // DELETE
+    
+  tableBody.addEventListener("click", function (event) {
+
+    const clickedElement = event.target;// Get the element that was clicked
+
+    const id = clickedElement.dataset.id;// Get the id stored in the button (data-id)
+
+    if (clickedElement.classList.contains("delete-btn")) {// Check if the clicked element has the class "delete-btn"
+
+      console.log("Deleting transaction with id:", id);
+
+      let updatedTransactions = [];// Create a new array without the deleted transaction
+
+      for (let i = 0; i < transactionArr.length; i++) {
+
+      // If this transaction's id is NOT the one we want to delete
+      if (transactionArr[i].id !== id) {
+      //keep it in the updated array
+      updatedTransactions.push(transactionArr[i]);
+    }
+  }
+      transactionArr = updatedTransactions;// Replace the old array with the new one
+}
+
+
+      saveTransactions(transactionArr);// Save updated list
+
+      renderApp();// Update table
+
+      addtodashboard();// Update dashboard
+
+      // EDIT
+    if (clickedElement.classList.contains("edit-btn")) {
+
+      console.log("Editing transaction with id:", id);
+
+      let transaction = null;
+
+      // Loop through transactions to find the matching one
+      for (let i = 0; i < transactionArr.length; i++) {
+
+        if (transactionArr[i].id === id) {
+          transaction = transactionArr[i];
+          break; // stop the loop once found
+        }
+      }
+
+      // If transaction was found, fill the form
+      if (transaction !== null) {
+
+        document.getElementById("description").value = transaction.description;
+        document.getElementById("amount").value = transaction.amount;
+        document.getElementById("category").value = transaction.category;
+        document.getElementById("date").value = transaction.date;
+
+        // Save the id so we know we are editing
+        editingId = id;
+        
+        if (editingId !== null) {   
+          for (let i = 0; i < transactionArr.length; i++) {
+            if (transactionArr[i].id === editingId) { 
+              transactionArr[i].description = description;
+              transactionArr[i].amount = parseFloat(amount);
+              transactionArr[i].category = category;
+              transactionArr[i].date = date;
+              transactionArr[i].updatedAt = new Date().toISOString();
+              break;
+            }
+          }
+          console.log("Updating transaction with id:", editingId);
+          editingId = null;
+          console.log("Transaction updated successfully.");
+        }
+      }
+    }
+
+    
+
+
+  });
+  
+
+   // When form is submitted
   form.addEventListener("submit", function (event) {
 
     event.preventDefault(); // Stop page refresh
@@ -104,53 +184,114 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
+    // UPDATE
+    if (editingId !== null) {   
+      // Loop through transactions
+    for (let i = 0; i < transactionArr.length; i++) {
 
-    // Create transaction object and add to in-memory array
-    const transaction = {
-      id: `txn_${++counter}`,
-      description,
-      amount: parseFloat(amount),
-      category,
-      date,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
+      // Check if this is the one we are editing
+      if (transactionArr[i].id === editingId) { 
 
-    transactionArr.push(transaction);
+        // Update its values
+        transactionArr[i].description = description;
+        transactionArr[i].amount = parseFloat(amount);
+        transactionArr[i].category = category;
+        transactionArr[i].date = date;
+        transactionArr[i].updatedAt = new Date().toISOString();
 
-    saveTransactions(transactionArr); // Save to localStorage
+          break; // Stop loop once found
+      }
+    }
 
-    //updates the table with the new transaction 
-    renderApp();
+      console.log("Updating transaction with id:", editingId);
 
-    //Update dashboard stats
-    addtodashboard();
+      // Reset editing mode
+      editingId = null;
 
-    // Clear form
-    form.reset(); 
-    
-    // If all validations pass
-    showMessage("Transaction added successfully!");
+      console.log("Transaction updated successfully.");
+    }
+      else {
+        // CREATE NEW transaction
+        const transaction = {
+          id: `txn_${++counter}`,
+          description,
+          amount: parseFloat(amount),
+          category,
+          date,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
 
+        transactionArr.push(transaction);
+        showMessage("Transaction added successfully!");
+      
+      }
+
+      //common actions
+      saveTransactions(transactionArr); // Save to localStorage
+      renderApp(); // Update table
+      addtodashboard(); // Update dashboard
+      form.reset(); // Clear form
   });
 
-});
 
-let transactionArr = []; 
-// This array will hold all the transaction records in memory.
-let counter = 0;
+  // Monthly cap logic
+  const monthlyCapInput = document.getElementById("monthly-cap");
+  const saveCapBtn = document.getElementById("save-cap");
+  const capMessage = document.getElementById("cap-message");
+
+  // Load saved cap
+  const savedCap = localStorage.getItem("monthlyCap");
+  if (savedCap) {
+    monthlyCapInput.value = savedCap;
+  }
+
+  // Save cap
+  saveCapBtn.addEventListener("click", function () {
+    const capValue = monthlyCapInput.value.trim();
+
+    if (capValue === "" || Number(capValue) < 0) {
+      capMessage.textContent = "Please enter a valid monthly limit.";
+      capMessage.style.color = "red";
+      return;
+    }
+
+    localStorage.setItem("monthlyCap", capValue);
+    capMessage.textContent = "Monthly limit saved!";
+    capMessage.style.color = "green";
+
+    addtodashboard(); // Recalculate dashboard
+  });
 
 
+  const searchInput = document.getElementById("site-search");
 
-let currentView = "table";
+  searchInput.addEventListener("input", function () {
+    renderApp(); // Re-render the app to apply search filter
+  });
+
+    const sortFieldSelect = document.getElementById("sort-field");
+    const sortDirectionSelect = document.getElementById("sort-direction");
+    const applySortBtn = document.getElementById("apply-sort");
+
+    applySortBtn.addEventListener("click", function () {
+
+      const selectedField = sortFieldSelect.value;
+      const selectedDirection = sortDirectionSelect.value;
+
+      if (!selectedField) {
+        alert("Please select a field to sort by.");
+        return;
+      }
+
+      currentSort.field = selectedField;
+      currentSort.direction = selectedDirection;
+
+      renderApp();
+    });
+  });
 
 
-
-let currentSort = {
-  field: null,
-  direction: "asc"
-};
-// This object will keep track of the current sorting state in ascending or descending.
 
 
 
@@ -164,13 +305,34 @@ function showTable(transactions) {
     const transaction = transactions[i];
     const newRow = document.createElement("tr");
   
-  newRow.innerHTML = `
-    <td>${transaction.id}</td>
-    <td>${transaction.description}</td>
-    <td>$${transaction.amount}</td>
-    <td>${transaction.category}</td>
-    <td>${transaction.date}</td>
-  `;
+    const searchValue = document.getElementById("site-search").value.trim();
+    let highlightRegex = null;
+
+    if (searchValue !== "") {
+      try {
+        highlightRegex = new RegExp(searchValue, "gi");
+      } catch (e) {
+        highlightRegex = null;
+      }
+    }
+
+    function highlight(text) {
+      if (!highlightRegex) return text;
+      return String(text).replace(highlightRegex, match => `<mark>${match}</mark>`);
+    }
+
+    newRow.innerHTML = `
+      <td>${highlight(transaction.id)}</td>
+      <td>${highlight(transaction.description)}</td>
+      <td>$${highlight(transaction.amount)}</td>
+      <td>${highlight(transaction.category)}</td>
+      <td>${highlight(transaction.date)}</td>
+      <td>
+        <button class="edit-btn" data-id="${transaction.id}">✏</button>
+        <button class="delete-btn" data-id="${transaction.id}">🗑</button>
+      </td>
+    `;
+
 
   // Append the new row to the table body
   tableBody.appendChild(newRow);
@@ -280,17 +442,75 @@ function addtodashboard() {
   document.getElementById("last-7-days").textContent = last7DaysCount;
 
 
+  // ===== Monthly Cap Logic =====
+const capMessage = document.getElementById("cap-message");
+const savedCapValue = localStorage.getItem("monthlyCap");
+
+if (savedCapValue) {
+
+  const todayDate = new Date();
+  const currentMonth = todayDate.getMonth();
+  const currentYear = todayDate.getFullYear();
+
+  let monthlyTotal = 0;
+
+  for (let i = 0; i < transactionArr.length; i++) {
+    const txnDate = new Date(transactionArr[i].date);
+
+    if (
+      txnDate.getMonth() === currentMonth &&
+      txnDate.getFullYear() === currentYear
+    ) {
+      monthlyTotal += transactionArr[i].amount;
+    }
+  }
+
+  const capNumber = parseFloat(savedCapValue);
+  const remaining = capNumber - monthlyTotal;
+
+  if (remaining >= 0) {
+    capMessage.textContent =
+      "Remaining this month: $" + remaining.toFixed(2);
+    capMessage.style.color = "green";
+  } else {
+    capMessage.textContent =
+      "Monthly limit exceeded by $" + Math.abs(remaining).toFixed(2);
+    capMessage.style.color = "red";
+  }
+}
 }
 
-function sortData(data) {
+  
 
-  // If no column is selected, return the original data
+function renderApp() {
+
+  // Make a copy of the transactions
+  let dataToRender = sortedTransactions();
+
+  //Apply regex filtering from search.js
+  const searchInput = document.getElementById("site-search");
+  dataToRender = searchFilter(dataToRender, searchInput.value.trim());
+
+  
+  // Check which view we are using
+  if (currentView === "table") {
+    showTable(dataToRender);
+  } 
+  else {
+    renderCards(dataToRender);
+  }
+}
+
+function sortedTransactions() {
+
+
+ // If no column is selected, return the original data
   if (!currentSort.field) {
-    return data;
+    return transactionArr;
   }
 
   // Make a copy of the array (so we don't change the original)
-  const sorted = data.slice();
+  const sorted = transactionArr.slice();
 
   // Sort the copied array
   sorted.sort(function (a, b) {
@@ -338,59 +558,8 @@ function sortData(data) {
   return sorted;
 }
 
-function renderApp() {
 
-  // Make a copy of the transactions
-  let dataToRender = transactionArr.slice();
-
-  // Sort the data
-  dataToRender = sortData(dataToRender);
-
-  // Apply search filter if search input exists
-  const searchValue = document.getElementById("site-search").value.trim();
-  if (searchValue !== "") {
-
-    try {
-      const searchRegex = new RegExp(searchValue, "i"); // Case-insensitive search
-      
-      dataToRender = dataToRender.filter(function (txn) {
-        return (
-          searchRegex.test(txn.description) || 
-        searchRegex.test(txn.category) ||
-        searchRegex.test(txn.amount.toString()) ||
-        searchRegex.test(txn.date)
-        );
-      });
-
-    } 
-    
-    catch (error) {
-      console.error("Error during search:", error);
-    }
-
-}
-  // Check which view we are using
-  if (currentView === "table") {
-    showTable(dataToRender);
-  } 
-  else {
-    renderCards(dataToRender);
-  }
-}
-
-// function renderCards(data) {
-//   const toggleBtn = document.getElementById("toggle-view");
-//   toggleBtn.addEventListener("click", () => {
-//   if (currentView === "table") {
-//     currentView = "cards";
-//     toggleBtn.textContent = "Switch to Table View";
-//   } else {
-//     currentView = "table";
-//     toggleBtn.textContent = "Switch to Cards View";
-//   }
-//   renderApp();
-// });
-
-// }
-
-
+// DOM, reendering, event listeners, and UI logic
+//AI usage
+//Prompt: “Help me clean and structure what I wrote keeping my comments.”
+//Decided not to add state.js was too complex for me to understand and implement in ui.js

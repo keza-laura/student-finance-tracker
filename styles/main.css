@@ -7,7 +7,7 @@
     --danger-color: #f56565;
     --text-color: #2d3748;
     --text-light: #718096;
-    --bg-color: #f7fafc;
+    --bg-color: #f6fafd;
     --card-bg: #ffffff;
     --border-color: #e2e8f0;
     --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -18,44 +18,14 @@
 /* ========== BASE (MOBILE FIRST) ========== */
 body{
     background-color: var(--bg-color);
-    font-family: Arial, sans-serif;
+    font-family: 'Montserrat', sans-serif;
     margin: 0;
     padding: 0;
     line-height: 1.5;
 }
-main {
-    padding: 20px;
-}
 
 header {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-    color: #fff;
-    padding: 20px;
-    text-align: center;
-}
-
-nav ul{
-    list-style: none;
-    padding: 0;
-    gap: 30px;
-    display: flex;
-    flex-wrap: wrap;
-
-}
-nav ul li a{
-    text-decoration: none;
-    color: white;
-}
-nav ul li a:hover{
-    color: var(--link-hover);
-}
-
-.footer {
-    text-align: center;
-    padding: 20px;
-    background-color: #333;
-    color: #fff;
-    margin-top: 20px;
+  color: #fff;
 }
 
 .skip-link {
@@ -69,23 +39,78 @@ nav ul li a:hover{
   background: yellow;
 }
 
-.stats {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  
+.title {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  padding: 20px 75px;
+}
+header h1 {
+  margin-bottom: 0;
 }
 
-.stat-card {
-  background: var(--card-bg);
-  color: var(--text-color);
+header p {
+    margin-top: 5px;
+}
+
+nav {
+    background-color: var(--bg-color);
+    box-shadow: var(--shadow);
+}
+  
+nav ul{
+    display: flex;
+    gap: 20px;
+    list-style: none;
+    padding-top: 5px;
+    padding-bottom: 20px;
+    justify-content: center;
+}
+nav ul li a{
+    color: var(--text-light);
+    text-decoration: none;
+    padding: 20px;
+  }
+  nav ul li a:hover{
+    color: var(--primary-color);
+    border-bottom: 3.3px solid var(--primary-color);
+}
+
+#main {
   padding: 1rem;
-  border-radius: 8px;
+}
+
+.main-title {
+  margin: 45px 0;
+}
+
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--card-bg);
+  border-radius: 7px;
+  padding: 30px 115px 30px 20px;
   transition: transform 0.2s ease;
+  box-shadow: var(--shadow-lg);
+  padding: 20px;
+  font-size: 0.9rem;
 }
 .stat-card:hover {
   transform: translateY(-5px);
   box-shadow: var(--shadow-lg);
+}
+
+span {
+  color: var(--primary-color);
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.spending-cap {
+  margin: 25px 0;
+  padding: 20px;
+  box-shadow: var(--shadow-lg); 
+  background-color: var(--card-bg);
+  border-radius: 7px;
 }
 
 form {
@@ -98,8 +123,6 @@ form {
   padding: 1rem;
   border-radius: 8px;
   box-shadow: var(--shadow);
-  
-  
 }
 form label {
   font-weight: bold;
@@ -108,7 +131,6 @@ form input, form select {
   padding: 0.5rem;
   border: 1px solid var(--border-color);
   border-radius: 4px;
-  /*width: 60%;*/
 }
 form button {
   background: var(--primary-color);
@@ -123,7 +145,6 @@ form button:hover {
   background: var(--primary-dark);
   transform: translateY(-5px);
   box-shadow: var(--shadow);
-
 }
 
 table {
@@ -131,15 +152,314 @@ table {
   padding: 1rem;
   border-radius: 8px;
   box-shadow: var(--shadow);
+  display: block;
+  overflow-x: auto;
+  width: 100%;
 }
+/* Inputs and buttons full width on mobile */
+form input, form select, form button {
+    width: 100%;
+}
+
+/* ========== SETTINGS SECTION ========== */
+.main-setting {
+  background-color: var(--card-bg);
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  margin-bottom: 2rem;
+  max-width: 500px; /* optional: keeps it nicely sized */
+}
+
+#settings label {
+  font-weight: bold;
+  margin-top: 1rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+#settings input, 
+#settings select {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+#settings input:focus, 
+#settings select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+}
+
+#settings button {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  color: #fff;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: transform 0.1s, box-shadow 0.2s;
+}
+
+#settings button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+#cap-message, #settings-status {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-light);
+}
+
+.about-card {
+  background-color: var(--card-bg);
+  padding: 1.5rem 2rem;
+  border-radius: 8px;
+  box-shadow: var(--shadow-lg);
+  margin-top: 1rem;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.about-card h2 {
+  margin-bottom: 0.8rem;
+  color: var(--primary-color);
+}
+
+.about-card p {
+  margin-bottom: 1rem;
+  color: var(--text-color);
+}
+
+.about-card ul {
+  list-style-type: disc;
+  padding-left: 20px;
+  margin-bottom: 1rem;
+}
+
+.about-card li {
+  margin-bottom: 0.5rem;
+  color: var(--text-color);
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #333;
+    color: #fff;
+    margin-top: 20px;
+}
+
+/* ========== SORTING & SEARCH CONTROLS ========== */
+
+.controls-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.field-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-light);
+}
+
+/* Select inputs inside controls */
+.select-wrap {
+  position: relative;
+}
+
+.select-wrap::after {
+  content: '▾';
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--primary-color);
+  font-size: 0.72rem;
+  pointer-events: none;
+}
+
+.controls-card select {
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--bg-color);
+  border: 1.5px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-color);
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 0.5rem 2.2rem 0.5rem 0.85rem;
+  cursor: pointer;
+  outline: none;
+  min-width: 152px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  /* reset width set by form select */
+  width: auto;
+}
+
+.controls-card select:hover {
+  border-color: var(--primary-color);
+}
+
+.controls-card select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+}
+
+/* Vertical divider between sort and search */
+.ctrl-divider {
+  width: 1px;
+  height: 36px;
+  background: var(--border-color);
+  flex-shrink: 0;
+}
+
+/* Apply Sort button */
+.btn-apply, #save-cap {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.52rem 1.2rem;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+  transition: opacity 0.2s, box-shadow 0.2s, transform 0.1s;
+  /* reset width set by form button */
+  width: auto;
+}
+
+.btn-apply:hover {
+  opacity: 0.92;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.5);
+  transform: translateY(-1px);
+}
+
+.btn-apply:active {
+  transform: scale(0.97);
+}
+
+/* Search group */
+.search-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  flex: 1;
+  min-width: 220px;
+}
+
+.search-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.input-wrap {
+  position: relative;
+  flex: 1;
+}
+
+.input-wrap svg {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  stroke: var(--text-light);
+  fill: none;
+  pointer-events: none;
+  transition: stroke 0.2s;
+}
+
+.input-wrap:focus-within svg {
+  stroke: var(--primary-color);
+}
+
+.controls-card input[type="search"] {
+  width: 100%;
+  background: var(--bg-color);
+  border: 1.5px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-color);
+  font-family: Arial, sans-serif;
+  font-size: 0.82rem;
+  padding: 0.5rem 0.85rem 0.5rem 2.1rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.controls-card input[type="search"]::placeholder {
+  color: var(--border-color);
+}
+
+.controls-card input[type="search"]:hover {
+  border-color: var(--primary-color);
+}
+
+.controls-card input[type="search"]:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+}
+
+/* Search button */
+.btn-search {
+  background: var(--card-bg);
+  border: 1.5px solid var(--primary-color);
+  border-radius: 8px;
+  color: var(--primary-color);
+  font-family: Arial, sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.5rem 1.1rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.1s;
+  /* reset width set by form button */
+  width: auto;
+}
+
+.btn-search:hover {
+  background: var(--primary-color);
+  color: #fff;
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-1px);
+}
+
 
 /* ========== TABLET (768px+) ========== */
 
 @media (min-width: 768px) {
 
   .stats {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+     display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
   }
 
   .layout {
@@ -166,8 +486,16 @@ table {
 
 /* ========== DESKTOP (1024px+) ========== */
 
+@media (min-width: 1024px) {
 
- @media (min-width: 1024px) {
+  #main {
+    padding: 2rem 6rem;
+  }
+
+  .stats {
+    display: flex;
+    justify-content: space-between;
+  }
 
   .app-layout {
     display: grid;
@@ -189,5 +517,10 @@ table {
   #dashboard {
     grid-column: 3;
   }
+  
+  table {
+    display: table;
+  }
+
 
 }
