@@ -113,3 +113,5 @@ npx playwright test --project=chromium
 ```
 
 Include test scenarios that create/edit/delete transactions, verify storage, and exercise keyboard shortcuts.
+
+video: https://youtu.be/5geAo2RYDgA
