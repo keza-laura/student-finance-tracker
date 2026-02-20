@@ -1,72 +1,115 @@
 # Student Finance Tracker
 
-## 1. Theme
+A small, client-side app to track student finances (income, expenses, balances).
 
-Student Finance Tracker — a simple budgeting tool for students.
+## Quick Start
 
-## 2. Purpose
+- **Open:** Launch the app by opening [index.html](index.html) in your browser.
+- **Seed Data:** Use [seed.json](seed.json) to preload sample transactions.
 
-Help students track spending and build budgeting habits with minimal friction.
+## Files
 
-## Sketches
+- **index:** [index.html](index.html) — main UI entry point.
+- **Scripts:** [scripts/search.js](scripts/search.js), [scripts/state.js](scripts/state.js), [scripts/storage.js](scripts/storage.js), [scripts/ui.js](scripts/ui.js), [scripts/validators.js](scripts/validators.js) — app logic and helpers.
+- **Styles:** [styles/main.css](styles/main.css) — styling for the UI.
 
-- Dashboard: balance at top, quick add button, recent transactions list, category sparklines.
+## Usage
 
-	[Top] Balance | Add [+]
-	-------------------------
-	Recent transactions
-	- Lunch — $12.50 — Food
+- Add transactions using the UI controls on the main page.
+- The app stores data locally (see [scripts/storage.js](scripts/storage.js)).
+- Use the search box to filter transactions (see [scripts/search.js](scripts/search.js)).
 
-- Add Transaction modal: fields for description, amount, currency, category (dropdown), date, save/cancel.
+## Notes & Next Steps
 
-- Transactions view: searchable, sortable list with filters (date range, category) and inline edit/delete.
+- This is a static app; no backend required. Host on any static-file server if needed.
+- Suggested improvements: CSV export/import, remote sync, enhanced validations.
 
-- Category/Budgets view: list of categories with monthly budgets and progress bars.
+## License
 
-- Settings: export/import JSON, currency selection, accessibility toggles (reduce motion, high contrast).
+- Unlicensed — adapt freely for learning or personal projects.
 
+## Chosen Theme
 
-## 3. Data Models
+- **Minimal & Accessible:** clean typography, generous spacing, high-contrast colors for readability, and clear affordances for forms and buttons. Designed to be legible on small screens and usable with keyboard-only navigation.
 
-Transaction (example):
+## Key Features
 
-```json
-{
-	"id": "txn_0001",
-	"description": "Lunch",
-	"amount": 12.50,
-	"currency": "USD",
-	"category": "cat_food",
-	"date": "2025-09-29",
-	"createdAt": "2025-09-29T12:34:56Z",
-	"updatedAt": "2025-09-29T12:34:56Z"
-}
+- Quick-add transactions (income/expense)
+- Persistent local storage (IndexedDB/localStorage via `scripts/storage.js`)
+- Search & filter transactions
+- Edit / delete transactions inline
+- Lightweight, responsive UI suitable for mobile and desktop
+
+## Regex Catalog (patterns + examples)
+
+Note: JavaScript regex literals shown; use flags (`i`, `g`) as needed.
+
+- Transaction ID
+
+	- Pattern: `/^txn_[A-Za-z0-9_-]{4,}$/`
+	- Example: `txn_0001`
+
+- Amount (decimal with optional sign)
+
+	- Pattern: `/^[+-]?\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?$/`
+	- Examples: `12.50`, `-5`, `1,234.99`
+
+- Simple Currency Code (ISO 4217)
+
+	- Pattern: `/^[A-Z]{3}$/`
+	- Examples: `USD`, `EUR`, `JPY`
+
+- Date (ISO YYYY-MM-DD)
+
+	- Pattern: `/^\d{4}-\d{2}-\d{2}$/`
+	- Examples: `2025-09-29`, `2026-02-20`
+
+- ISO 8601 Datetime (basic validation)
+
+	- Pattern: `/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/`
+	- Example: `2025-09-29T12:34:56Z`
+
+Adjust patterns in `scripts/validators.js` as needed for stricter validation.
+
+## Keyboard Map (Shortcuts)
+
+- `/` : Focus search input
+- `N` or `A` : Open "Add Transaction" form
+- `Enter` : Submit focused form control (or save when in modal)
+- `Esc` : Close modal / cancel edit
+- `ArrowUp` / `ArrowDown` : Navigate transaction list
+- `Ctrl/Cmd + S` : Export or open export dialog (if implemented)
+
+Shortcuts are implemented in `scripts/ui.js` when present; customize as needed.
+
+## Accessibility Notes
+
+- Semantic HTML: use landmarks and appropriate form labels
+- Focus management: visible focus styles and logical tab order
+- `aria-live` regions for success/error messages
+- Keyboard operability: all interactive elements reachable and usable with keyboard only
+- Color contrast: ensure text contrasts meet WCAG AA (4.5:1 for normal text)
+
+Use browser accessibility tools (Lighthouse, Accessibility Inspector) to audit and iterate.
+
+## How to Run Tests
+
+- Manual test page: open [test.html](test.html) in your browser and follow the test scenarios described there.
+- Local static server (recommended for accurate file loading):
+
+```bash
+# from the project root
+python -m http.server 8000
+# then open http://localhost:8000/test.html
 ```
 
-Category (example):
+- Suggested automated tests (optional):
+	- Add end-to-end tests with Playwright or Cypress. Example (Playwright):
 
-```json
-{
-	"id": "cat_food",
-	"name": "Food",
-	"monthlyBudget": 200.00
-}
+```bash
+npm init -y
+npm i -D @playwright/test
+npx playwright test --project=chromium
 ```
 
-Notes:
-- `id`: string, unique identifier
-- `amount`/`monthlyBudget`: numbers (decimals allowed)
-- `date`, `createdAt`, `updatedAt`: ISO 8601 strings
-
-## 4. Accessibility Plan
-
-- Skip to content link: add a visible "Skip to content" link at the top of pages.
-- Visible focus styles: ensure high-contrast focus outlines for all interactive elements.
-- `aria-live` region for alerts: use a polite region for non-blocking success/error/capacity messages.
-- Keyboard navigation: all features (navigation, forms, add/edit transactions, modals) must be operable via keyboard only.
-
-## 5. Breakpoints
-
-- 360px — Mobile
-- 768px — Tablet
-- 1024px — Desktop
+Include test scenarios that create/edit/delete transactions, verify storage, and exercise keyboard shortcuts.
